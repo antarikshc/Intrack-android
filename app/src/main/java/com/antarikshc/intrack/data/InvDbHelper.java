@@ -16,7 +16,7 @@ public class InvDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "inventory.db";
     private static final int DATABASE_VERSION = 1;
 
-    public InvDbHelper(Context context) {
+    InvDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -33,7 +33,7 @@ public class InvDbHelper extends SQLiteOpenHelper {
                 + InvEntry.COLUMN_ITEM_STOCK + " INTEGER NOT NULL DEFAULT 0, "
                 + InvEntry.COLUMN_ITEM_CAPACITY + " INTEGER, "
                 + InvEntry.COLUMN_ITEM_ICON + " BLOB, "
-                + InvEntry.COLUMN_ITEM_SUP_PHONE + " INTEGER, "
+                + InvEntry.COLUMN_ITEM_SUP_PHONE + " TEXT, " //TEXT because we will save country code too
                 + InvEntry.COLUMN_ITEM_SUP_EMAIL + " TEXT);";
 
         // Execute the SQL statement
