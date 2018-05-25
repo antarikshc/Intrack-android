@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:background="@drawable/item_background"
+    android:paddingBottom="4dp"
+    android:paddingEnd="8dp"
+    android:paddingStart="8dp"
+    android:paddingTop="8dp">
+
+    <ImageView
+        android:id="@+id/item_icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        app:srcCompat="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/item_icon"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/stock_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/item_name"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/item_icon"
+        android:text="@string/stock_text"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/stock_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/item_name"
+        android:layout_marginStart="4dp"
+        android:layout_toEndOf="@+id/stock_text"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/sale_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/item_icon"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/sale_button_background"
+        android:text="@string/sale_button"
+        android:textAllCaps="true"
+        android:textSize="18sp" />
+
+    <View
+        android:id="@+id/view_line"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/item_icon"
+        android:layout_marginTop="6dp"
+        android:background="#e0e0e0" />
+
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/view_line"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/order_button_layout"
+            style="@style/ButtonLayout">
+
+            <ImageView
+                android:id="@+id/order_button_icon"
+                android:layout_width="14dp"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_order" />
+
+            <TextView
+                android:id="@+id/order_button_text"
+                style="@style/ButtonLayoutText"
+                android:layout_toEndOf="@+id/order_button_icon"
+                android:text="@string/order_button" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/stock_button_layout"
+            style="@style/ButtonLayout">
+
+            <ImageView
+                android:id="@+id/stock_button_image"
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_stock" />
+
+            <TextView
+                android:id="@+id/stock_button_text"
+                style="@style/ButtonLayoutText"
+                android:layout_toEndOf="@+id/stock_button_image"
+                android:text="@string/stock_button" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/edit_button_layout"
+            style="@style/ButtonLayout">
+
+            <ImageView
+                android:id="@+id/edit_button_icon"
+                android:layout_width="16dp"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_edit" />
+
+            <TextView
+                android:id="@+id/edit_button_text"
+                style="@style/ButtonLayoutText"
+                android:layout_toEndOf="@+id/edit_button_icon"
+                android:text="@string/edit_button" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

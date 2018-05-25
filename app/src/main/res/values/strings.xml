@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Intrack</string>
+    <string name="stock_text">Stock:</string>
+    <string name="sale_button">sale</string>
+    <string name="order_button">Order</string>
+    <string name="stock_button">Stock</string>
+    <string name="edit_button">Edit</string>
+</resources>
