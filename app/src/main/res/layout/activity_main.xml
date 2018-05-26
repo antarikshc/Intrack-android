@@ -7,11 +7,13 @@
     android:paddingEnd="16dp"
     tools:context=".MainActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <ListView
         android:id="@+id/item_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="6dp"
         android:divider="@android:color/white"
         android:dividerHeight="9.0sp"
         tools:listitem="@layout/custom_list" />
+
 </RelativeLayout>

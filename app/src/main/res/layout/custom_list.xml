@@ -4,7 +4,6 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="6dp"
     android:background="@drawable/item_background"
     android:paddingBottom="4dp"
     android:paddingEnd="8dp"
@@ -39,15 +38,13 @@
         android:text="@string/stock_text"
         android:textSize="16sp" />
 
-    <TextView
+    <TextSwitcher
         android:id="@+id/stock_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/item_name"
         android:layout_marginStart="4dp"
-        android:layout_toEndOf="@+id/stock_text"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:layout_toEndOf="@+id/stock_text" />
 
     <TextView
         android:id="@+id/sale_button"

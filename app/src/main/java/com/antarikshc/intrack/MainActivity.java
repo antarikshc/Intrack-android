@@ -7,7 +7,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.widget.ListView;
 
 import com.antarikshc.intrack.data.InvContract;
 import com.antarikshc.intrack.data.InvContract.InvEntry;
@@ -19,11 +19,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     private static final int INVENT_LOADER = 0;
 
+    /**
+     * Adapter and the ListView
+     */
+    ListView itemListView;
+    InvCursorAdapter cursorAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Find the ListView which will be populated with the inventory data
+        itemListView = findViewById(R.id.item_list);
+
+        // There is no pet data yet (until the loader finishes) so pass in null for the Cursor.
+        cursorAdapter = new InvCursorAdapter(this, null);
+        itemListView.setAdapter(cursorAdapter);
 
         insertDummyItem();
 
@@ -55,24 +68,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        if (data != null && data.moveToFirst()) {
-
-            String name = data.getString(data.getColumnIndex(InvEntry.COLUMN_ITEM_NAME));
-            Integer stock = data.getInt(data.getColumnIndex(InvEntry.COLUMN_ITEM_STOCK));
-            String phone = data.getString(data.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_PHONE));
-            String email = data.getString(data.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_EMAIL));
-
-            Log.i("Item Name", name);
-            Log.i("Item Stock", String.valueOf(stock));
-            Log.i("Supplier Phone", phone);
-            Log.i("Supplier Email", email);
-
+        if (data != null) {
+            cursorAdapter.swapCursor(data);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        cursorAdapter.swapCursor(null);
     }
 
     /**
