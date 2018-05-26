@@ -18,20 +18,19 @@ import com.antarikshc.intrack.data.InvContract.InvEntry;
 
 public class InvCursorAdapter extends CursorAdapter {
 
+    InvCursorAdapter(Context context, Cursor c) {
+        super(context, c, /* flags */ 0);
+    }
+
     TextView itemName;
     TextSwitcher itemStockAmount;
+    TextView myText;
 
     RelativeLayout orderButton;
     RelativeLayout stockButton;
     RelativeLayout editButton;
 
     TextView saleButton;
-
-    TextView myText;
-
-    InvCursorAdapter(Context context, Cursor c) {
-        super(context, c, /* flags */ 0);
-    }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -42,7 +41,7 @@ public class InvCursorAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, final Context context, Cursor cursor) {
+    public void bindView(final View view, final Context context, Cursor cursor) {
 
         // Find individual views that we want to modify in the list item layout
         itemName = view.findViewById(R.id.item_name);
@@ -63,6 +62,7 @@ public class InvCursorAdapter extends CursorAdapter {
         int supEmailIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_EMAIL);
 
         itemName.setText(cursor.getString(nameIndex));
+
         final String stock = String.valueOf(cursor.getInt(stockAmountIndex));
         itemStockAmount.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
@@ -85,6 +85,7 @@ public class InvCursorAdapter extends CursorAdapter {
         Animation outAnim = AnimationUtils.loadAnimation(context, android.R.anim.slide_out_right);
         outAnim.setDuration(300);
 
+        // Set the slide In and slide Out animation to TextSwitcher
         itemStockAmount.setInAnimation(inAnim);
         itemStockAmount.setOutAnimation(outAnim);
 
@@ -93,9 +94,20 @@ public class InvCursorAdapter extends CursorAdapter {
             public void onClick(View v) {
 
                 v.startAnimation(buttonClick);
+
+                // CursorAdapter has finished providing ListView the items
+                // Our views are currently bind to the latest item of the list
+                // bind views again for the current item
+                itemStockAmount = view.findViewById(R.id.stock_number);
+
+                // get the TextView of current TextSwitcher
+                myText = (TextView) itemStockAmount.getCurrentView();
+
                 Integer currentStock = Integer.parseInt((String) myText.getText());
+
+                // Update both the TextViews.
                 itemStockAmount.setText(String.valueOf(currentStock - 1));
-                myText.setText(String.valueOf(currentStock - 1));
+                itemStockAmount.setCurrentText(String.valueOf(currentStock - 1));
 
             }
         });
