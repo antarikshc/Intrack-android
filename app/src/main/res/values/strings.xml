@@ -5,4 +5,13 @@
     <string name="order_button">Order</string>
     <string name="stock_button">Stock</string>
     <string name="edit_button">Edit</string>
+    <string name="item_name">Item Name</string>
+    <string name="supplier_info">Supplier Info</string>
+    <string name="supplier_phone_hint">Phone</string>
+    <string name="supplier_email_hint">Email</string>
+    <string name="edit_image">EDIT IMAGE</string>
+    <string name="stock">Stock</string>
+    <string name="capacity">Capacity</string>
+    <string name="optional">(optional)</string>
+    <string name="save">SAVE</string>
 </resources>

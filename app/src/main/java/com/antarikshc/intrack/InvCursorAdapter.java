@@ -1,6 +1,7 @@
 package com.antarikshc.intrack;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -131,7 +132,8 @@ public class InvCursorAdapter extends CursorAdapter {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("Inventory Item", "Edit this shit up.");
+                Intent intent = new Intent(context, EditorActivity.class);
+                context.startActivity(intent);
                 v.startAnimation(buttonClick);
             }
         });
