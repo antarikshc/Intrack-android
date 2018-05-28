@@ -14,4 +14,6 @@
     <string name="capacity">Capacity</string>
     <string name="optional">(optional)</string>
     <string name="save">SAVE</string>
+    <string name="click_photo">Click a photo</string>
+    <string name="choose_photo">Choose a photo</string>
 </resources>
