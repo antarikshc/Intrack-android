@@ -16,4 +16,6 @@
     <string name="save">SAVE</string>
     <string name="click_photo">Click a photo</string>
     <string name="choose_photo">Choose a photo</string>
+    <string name="make_call">Make a call</string>
+    <string name="type_email">Type an Email</string>
 </resources>

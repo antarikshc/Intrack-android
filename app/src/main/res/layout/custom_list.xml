@@ -44,7 +44,21 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/item_name"
         android:layout_marginStart="4dp"
-        android:layout_toEndOf="@+id/stock_text" />
+        android:layout_toEndOf="@+id/stock_text">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </TextSwitcher>
 
     <TextView
         android:id="@+id/sale_button"

@@ -39,7 +39,7 @@ public class EditorActivity extends AppCompatActivity {
     AppCompatEditText editSupplierEmail;
     ImageView supEmailIcon;
 
-    // ID for Image intents
+    // Request codes for Image intents
     public static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final int PICK_IMAGE = 2;
 

@@ -3,10 +3,13 @@ package com.antarikshc.intrack;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ListView;
 
 import com.antarikshc.intrack.data.InvContract;
@@ -25,6 +28,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     ListView itemListView;
     InvCursorAdapter cursorAdapter;
 
+    // FAB Button
+    FloatingActionButton fabAdd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Find the ListView which will be populated with the inventory data
         itemListView = findViewById(R.id.item_list);
 
+        fabAdd = findViewById(R.id.fab_add_button);
+
         // There is no pet data yet (until the loader finishes) so pass in null for the Cursor.
         cursorAdapter = new InvCursorAdapter(this, null);
         itemListView.setAdapter(cursorAdapter);
@@ -42,6 +50,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // Initiate the loader
         getLoaderManager().initLoader(INVENT_LOADER, null, this);
+
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -90,5 +106,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         values.put(InvEntry.COLUMN_ITEM_SUP_EMAIL, "order@flipkart.com");
 
         getContentResolver().insert(InvContract.CONTENT_URI, values);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

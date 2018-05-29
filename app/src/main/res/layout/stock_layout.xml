@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/key_arrow_down"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignStart="@+id/save_stock_button"
+        android:layout_marginTop="4dp"
+        app:srcCompat="@drawable/ic_arrow_down" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/edit_stock_amount"
+        android:layout_width="71dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/key_arrow_down"
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:inputType="number"
+        android:maxLines="1"
+        android:textAlignment="center"
+        app:backgroundTint="@color/light_blue_text_view" />
+
+    <ImageView
+        android:id="@+id/key_arrow_up"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:layout_toEndOf="@+id/edit_stock_amount"
+        app:srcCompat="@drawable/ic_arrow_up" />
+
+    <TextView
+        android:id="@+id/save_stock_button"
+        android:layout_width="154dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_stock_amount"
+        android:layout_marginTop="10dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/save_update_button_bkg"
+        android:text="@string/save"
+        android:textAlignment="center"
+        android:textColor="@android:color/white" />
+
+</RelativeLayout>
