@@ -1,8 +1,12 @@
 package com.antarikshc.intrack;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -18,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
+import com.antarikshc.intrack.data.InvContract;
 import com.antarikshc.intrack.data.InvContract.InvEntry;
 
 public class InvCursorAdapter extends CursorAdapter {
@@ -37,11 +42,15 @@ public class InvCursorAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(final View view, final Context context, Cursor cursor) {
+    public void bindView(final View view, final Context context, final Cursor cursor) {
 
         // Find individual views that we want to modify in the list item layout
         TextView itemName = view.findViewById(R.id.item_name);
+
+        ImageView itemIcon = view.findViewById(R.id.item_icon);
+
         itemStockAmount = view.findViewById(R.id.stock_number);
+        TextView itemStockCapacity = view.findViewById(R.id.stock_capacity);
 
         TextView saleButton = view.findViewById(R.id.sale_button);
         RelativeLayout orderButton = view.findViewById(R.id.order_button_layout);
@@ -50,19 +59,39 @@ public class InvCursorAdapter extends CursorAdapter {
 
         // Cursor sometimes return columns in unordered fashion
         // Get the indices manually ... bruhh
-        int nameIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_NAME);
+        final int id = cursor.getColumnIndex(InvEntry._ID);
+        final int nameIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_NAME);
         int stockAmountIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_STOCK);
         int stockCapacityIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_CAPACITY);
         int iconColumnIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_ICON);
-        int supPhoneIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_PHONE);
-        int supEmailIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_EMAIL);
+        final int supPhoneIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_PHONE);
+        final int supEmailIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_EMAIL);
 
+        // Content URI for current item
+        final Uri contentUri = ContentUris.withAppendedId(InvContract.CONTENT_URI, cursor.getInt(id));
+
+        // Set the Item Name
         itemName.setText(cursor.getString(nameIndex));
+
+        // Retrieve blob from cursor and convert to Bitmap
+        byte[] imgByte = cursor.getBlob(iconColumnIndex);
+        Bitmap iconOfItem = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+        // Set the bitmap to ImageView
+        itemIcon.setImageBitmap(iconOfItem);
+
 
         final String stock = String.valueOf(cursor.getInt(stockAmountIndex));
 
         // Set current stock amount to one of the TextView from TextSwitcher
         itemStockAmount.setCurrentText(stock);
+
+        // If present, set the capacity of the Stock
+        if (cursor.isNull(stockCapacityIndex)) {
+            // Remove the view
+            itemStockCapacity.setVisibility(View.GONE);
+        } else {
+            itemStockCapacity.setText(" / " + cursor.getString(stockCapacityIndex));
+        }
 
         // Bounce animation for buttons
         final Animation buttonClick = AnimationUtils.loadAnimation(context, R.anim.bounce);
@@ -82,7 +111,7 @@ public class InvCursorAdapter extends CursorAdapter {
         saleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // Initiate animation of the button
                 v.startAnimation(buttonClick);
 
                 // CursorAdapter has finished providing ListView the items
@@ -93,10 +122,16 @@ public class InvCursorAdapter extends CursorAdapter {
                 // get the TextView of current TextSwitcher
                 TextView myText = (TextView) itemStockAmount.getCurrentView();
 
-                Integer currentStock = Integer.parseInt((String) myText.getText());
+                Integer currentStock = Integer.parseInt(myText.getText().toString());
 
                 // Update both the TextViews.
                 itemStockAmount.setText(String.valueOf(currentStock - 1));
+
+                // Update Database with decrement in stock
+                ContentValues values = new ContentValues();
+                values.put(InvEntry.COLUMN_ITEM_STOCK, currentStock - 1);
+
+                context.getContentResolver().update(contentUri, values, null, null);
 
             }
         });
@@ -104,6 +139,7 @@ public class InvCursorAdapter extends CursorAdapter {
         orderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Initiate animation of the button
                 v.startAnimation(buttonClick);
 
                 LayoutInflater inflater = LayoutInflater.from(context);
@@ -118,13 +154,42 @@ public class InvCursorAdapter extends CursorAdapter {
                 dialog.setContentView(R.layout.order_layout);
 
                 TextView callButton = dialogView.findViewById(R.id.call_button);
+                TextView phoneNum = dialogView.findViewById(R.id.phone_num_subtext);
                 TextView emailButton = dialogView.findViewById(R.id.mail_button);
+                TextView emailId = dialogView.findViewById(R.id.email_num_subtext);
+                TextView noInfo = dialogView.findViewById(R.id.no_sup_info);
+
+                String phone = null;
+                String email = null;
+
+                // Store values to the strings if present
+                if (!cursor.isNull(supPhoneIndex)) {
+                    phone = cursor.getString(supPhoneIndex);
+                    phoneNum.setText("(" + phone + ")");
+                }
+                if (!cursor.isNull(supEmailIndex)) {
+                    email = cursor.getString(supEmailIndex);
+                    emailId.setText("(" + email + ")");
+                }
+
+                // Null checks to hide/show views
+                if (phone == null) {
+                    callButton.setVisibility(View.GONE);
+                    phoneNum.setVisibility(View.GONE);
+                }
+                if (email == null) {
+                    emailButton.setVisibility(View.GONE);
+                    emailId.setVisibility(View.GONE);
+                }
+                if (phone == null && email == null) {
+                    noInfo.setVisibility(View.VISIBLE);
+                }
 
                 callButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                        callIntent.setData(Uri.parse("tel:0123456789"));
+                        callIntent.setData(Uri.parse("tel:" + cursor.getString(supPhoneIndex)));
                         context.startActivity(callIntent);
 
                         dialog.dismiss();
@@ -137,8 +202,8 @@ public class InvCursorAdapter extends CursorAdapter {
                     public void onClick(View v) {
                         Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                         emailIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                        emailIntent.putExtra(Intent.EXTRA_EMAIL, "antarikshc@gmail.com");
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Order for Item Name");
+                        emailIntent.putExtra(Intent.EXTRA_EMAIL, cursor.getString(supEmailIndex));
+                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Order for " + cursor.getString(nameIndex));
                         if (emailIntent.resolveActivity(context.getPackageManager()) != null) {
                             context.startActivity(emailIntent);
                         }
@@ -154,6 +219,7 @@ public class InvCursorAdapter extends CursorAdapter {
         stockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Initiate animation of the button
                 v.startAnimation(buttonClick);
 
                 LayoutInflater inflater = LayoutInflater.from(context);
@@ -172,6 +238,8 @@ public class InvCursorAdapter extends CursorAdapter {
                 ImageView keyUp = dialogView.findViewById(R.id.key_arrow_up);
                 TextView saveStock = dialogView.findViewById(R.id.save_stock_button);
 
+                // Yep. Find the view again and update the EditText for Stock amount
+                itemStockAmount = view.findViewById(R.id.stock_number);
                 String currentStock = (String) ((TextView) itemStockAmount.getCurrentView()).getText();
                 editStockAmount.setText(currentStock);
 
@@ -179,7 +247,7 @@ public class InvCursorAdapter extends CursorAdapter {
                 keyDown.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Integer currentAmount = Integer.parseInt(String.valueOf(editStockAmount.getText()));
+                        Integer currentAmount = Integer.parseInt((editStockAmount.getText().toString()));
                         editStockAmount.setText(String.valueOf(currentAmount - 1));
                     }
                 });
@@ -188,7 +256,7 @@ public class InvCursorAdapter extends CursorAdapter {
                 keyUp.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Integer currentAmount = Integer.parseInt(String.valueOf(editStockAmount.getText()));
+                        Integer currentAmount = Integer.parseInt(editStockAmount.getText().toString());
                         editStockAmount.setText(String.valueOf(currentAmount + 1));
                     }
                 });
@@ -199,7 +267,14 @@ public class InvCursorAdapter extends CursorAdapter {
                         // Our views are currently bind to the latest item of the list
                         // bind views again for the current item
                         itemStockAmount = view.findViewById(R.id.stock_number);
-                        itemStockAmount.setCurrentText(String.valueOf(editStockAmount.getText()));
+                        String updatedStock = editStockAmount.getText().toString();
+                        itemStockAmount.setCurrentText(updatedStock);
+
+                        // Update Database with new stock amount
+                        ContentValues values = new ContentValues();
+                        values.put(InvEntry.COLUMN_ITEM_STOCK, Integer.parseInt(updatedStock));
+                        context.getContentResolver().update(contentUri, values, null, null);
+
                         dialog.dismiss();
                     }
                 });
@@ -211,8 +286,17 @@ public class InvCursorAdapter extends CursorAdapter {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Initiate animation of the button
                 v.startAnimation(buttonClick);
+
+                // Create intent for EditorActivity
                 Intent intent = new Intent(context, EditorActivity.class);
+
+                // Pass URI for current item from the list
+                Uri currentItemUri = ContentUris.withAppendedId(InvContract.CONTENT_URI, cursor.getInt(id));
+                // Set the URI on the data field of the intent
+                intent.setData(currentItemUri);
+
                 context.startActivity(intent);
             }
         });

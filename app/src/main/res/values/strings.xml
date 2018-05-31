@@ -1,21 +1,54 @@
 <resources>
     <string name="app_name">Intrack</string>
+
     <string name="stock_text">Stock:</string>
+
     <string name="sale_button">sale</string>
     <string name="order_button">Order</string>
     <string name="stock_button">Stock</string>
     <string name="edit_button">Edit</string>
+
     <string name="item_name">Item Name</string>
-    <string name="supplier_info">Supplier Info</string>
+
+    <string name="supplier_info">Supplier Info (optional)</string>
     <string name="supplier_phone_hint">Phone</string>
     <string name="supplier_email_hint">Email</string>
-    <string name="edit_image">EDIT IMAGE</string>
     <string name="stock">Stock</string>
     <string name="capacity">Capacity</string>
     <string name="optional">(optional)</string>
-    <string name="save">SAVE</string>
+
+    <string name="edit_image">EDIT IMAGE</string>
+
+    <string name="save_button">SAVE</string>
+    <string name="update_button">UPDATE</string>
+
     <string name="click_photo">Click a photo</string>
     <string name="choose_photo">Choose a photo</string>
+
     <string name="make_call">Make a call</string>
     <string name="type_email">Type an Email</string>
+    <string name="no_supplier_info">No supplier info.</string>
+
+    <string name="editor_activity_new_title">Add an Item</string>
+    <string name="editor_activity_edit_title">Edit Item</string>
+
+    <string name="editor_insert_item_failed">Error with saving item</string>
+    <string name="editor_update_item_successful">Item updated</string>
+
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+    <string name="discard">Discard</string>
+    <string name="keep_editing">Keep Editing</string>
+
+    <string name="delete_dialog_msg">Delete this item?</string>
+
+    <string name="editor_delete_pet_successful">Item deleted</string>
+    <string name="editor_delete_pet_failed">Error with deleting item</string>
+
+    <string name="action_insert_dummy_data">Insert Dummy Data</string>
+    <string name="action_delete_all_entries">Delete All Items</string>
+
+    <string name="delete_all_dialog_msg">Delete all items?</string>
 </resources>

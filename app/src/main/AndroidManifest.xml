@@ -22,7 +22,9 @@
             android:authorities="com.antarikshc.intrack"
             android:exported="false" />
 
-        <activity android:name=".EditorActivity" />
+        <activity
+            android:name=".EditorActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

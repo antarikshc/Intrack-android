@@ -23,7 +23,7 @@
         android:inputType="number"
         android:maxLines="1"
         android:textAlignment="center"
-        app:backgroundTint="@color/light_blue_text_view" />
+        app:backgroundTint="@color/light_purple_text_view" />
 
     <ImageView
         android:id="@+id/key_arrow_up"
@@ -41,7 +41,7 @@
         android:layout_marginTop="10dp"
         android:layout_centerInParent="true"
         android:background="@drawable/save_update_button_bkg"
-        android:text="@string/save"
+        android:text="@string/save_button"
         android:textAlignment="center"
         android:textColor="@android:color/white" />
 
