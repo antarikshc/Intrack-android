@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.antarikshc.intrack.data.InvContract;
 import com.antarikshc.intrack.data.InvContract.InvEntry;
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     // FAB Button
     FloatingActionButton fabAdd;
 
+    // Spinning Loader
+    ProgressBar loadSpin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // Find the ListView which will be populated with the inventory data
         itemListView = findViewById(R.id.item_list);
+
+        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
+        View emptyView = findViewById(R.id.empty_view);
+        itemListView.setEmptyView(emptyView);
+
+        loadSpin = findViewById(R.id.loadSpin);
 
         fabAdd = findViewById(R.id.fab_add_button);
 
@@ -97,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        loadSpin.setVisibility(View.GONE);
 
         if (data != null) {
             cursorAdapter.swapCursor(data);

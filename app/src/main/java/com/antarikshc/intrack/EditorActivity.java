@@ -99,6 +99,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private boolean mItemHasChanged = false;
 
     /**
+     * Boolean flag that keeps track of whether the Icon has changed or not
+     */
+    private boolean mItemIconHasChanged = false;
+
+    /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mItemHasChanged boolean to true.
      */
@@ -322,7 +327,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // Get the info from EditTexts
         String nameOfItem = editItemName.getText().toString().trim();
-        Bitmap iconOfItem = ((BitmapDrawable) itemIcon.getDrawable()).getBitmap();
         String stockOfItem = editStockAmount.getText().toString().trim();
         String capacityOfItem = editStockCapacity.getText().toString().trim();
         String supPhoneOfItem = editSupplierPhone.getText().toString().trim();
@@ -349,16 +353,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return;
         }
 
-        // Converting Bitmap to ByteArray
-        byte[] img = getBitmapAsByteArray(iconOfItem);
-
         ContentValues values = new ContentValues();
         values.put(InvEntry.COLUMN_ITEM_NAME, nameOfItem);
         values.put(InvEntry.COLUMN_ITEM_STOCK, stockOfItem);
-        values.put(InvEntry.COLUMN_ITEM_ICON, img);
         values.put(InvEntry.COLUMN_ITEM_CAPACITY, capacityOfItem);
         values.put(InvEntry.COLUMN_ITEM_SUP_PHONE, supPhoneOfItem);
         values.put(InvEntry.COLUMN_ITEM_SUP_EMAIL, supEmailOfItem);
+
+        // Only process the Bitmap if user has selected new image
+        if (mItemIconHasChanged) {
+            Bitmap iconOfItem = ((BitmapDrawable) itemIcon.getDrawable()).getBitmap();
+            // Converting Bitmap to ByteArray
+            byte[] img = getBitmapAsByteArray(iconOfItem);
+
+            values.put(InvEntry.COLUMN_ITEM_ICON, img);
+        }
 
 
         // Determine if this is a new or existing item by checking if mCurrentUri is null or not
@@ -441,6 +450,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             try {
                 croppedImage = cropImage(imageBitmap);
                 itemIcon.setImageBitmap(croppedImage);
+
+                mItemIconHasChanged = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -452,6 +463,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 croppedImage = cropImage(imageBitmap);
                 itemIcon.setImageBitmap(croppedImage);
+
+                mItemIconHasChanged = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -518,11 +531,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 editSupplierEmail.setText(data.getString(supEmailIndex));
             }
 
-            // Retrieve blob from cursor and convert to Bitmap
-            byte[] imgByte = data.getBlob(iconColumnIndex);
-            Bitmap iconOfItem = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
-            // Set the bitmap to ImageView
-            itemIcon.setImageBitmap(iconOfItem);
+            if (!data.isNull(iconColumnIndex)) {
+                // Retrieve blob from cursor and convert to Bitmap
+                byte[] imgByte = data.getBlob(iconColumnIndex);
+                Bitmap iconOfItem = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+                // Set the bitmap to ImageView
+                itemIcon.setImageBitmap(iconOfItem);
+            }
 
         }
 

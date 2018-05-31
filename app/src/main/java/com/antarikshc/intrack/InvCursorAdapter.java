@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,11 +74,13 @@ public class InvCursorAdapter extends CursorAdapter {
         // Set the Item Name
         itemName.setText(cursor.getString(nameIndex));
 
-        // Retrieve blob from cursor and convert to Bitmap
-        byte[] imgByte = cursor.getBlob(iconColumnIndex);
-        Bitmap iconOfItem = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
-        // Set the bitmap to ImageView
-        itemIcon.setImageBitmap(iconOfItem);
+        if (!cursor.isNull(iconColumnIndex)) {
+            // Retrieve blob from cursor and convert to Bitmap
+            byte[] imgByte = cursor.getBlob(iconColumnIndex);
+            Bitmap iconOfItem = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+            // Set the bitmap to ImageView
+            itemIcon.setImageBitmap(iconOfItem);
+        }
 
 
         final String stock = String.valueOf(cursor.getInt(stockAmountIndex));
@@ -86,11 +89,25 @@ public class InvCursorAdapter extends CursorAdapter {
         itemStockAmount.setCurrentText(stock);
 
         // If present, set the capacity of the Stock
-        if (cursor.isNull(stockCapacityIndex)) {
+        String placeHolderStockCap = cursor.getString(stockCapacityIndex);
+        if (cursor.isNull(stockCapacityIndex) || placeHolderStockCap.isEmpty()) {
+
             // Remove the view
             itemStockCapacity.setVisibility(View.GONE);
+
         } else {
-            itemStockCapacity.setText(" / " + cursor.getString(stockCapacityIndex));
+
+            itemStockCapacity.setText(" / " + placeHolderStockCap);
+
+            // Set the stock color depending on capacity
+            int stockColor = colorizeStock(context,
+                    Integer.parseInt(stock),
+                    Integer.parseInt(placeHolderStockCap));
+
+            TextView stockTextView = (TextView) itemStockAmount.getCurrentView();
+            stockTextView.setTextColor(stockColor);
+            itemStockCapacity.setTextColor(stockColor);
+
         }
 
         // Bounce animation for buttons
@@ -303,6 +320,20 @@ public class InvCursorAdapter extends CursorAdapter {
 
     }
 
+    // We will indicate if user is running low on stock
+    private int colorizeStock(Context context, Integer stock, Integer capacity) {
+
+        float ratio = stock.floatValue() / capacity.floatValue();
+
+        if (ratio < 0.2) {
+            return ContextCompat.getColor(context, R.color.stock_red_text);
+        } else if (ratio > 0.8) {
+            return ContextCompat.getColor(context, R.color.stock_green_text);
+        } else {
+            return ContextCompat.getColor(context, android.R.color.tab_indicator_text);
+        }
+
+    }
 
     class BounceInterpolator implements android.view.animation.Interpolator {
         // Using custom BounceInterpolator so we can adjust the amp and freq

@@ -6,4 +6,7 @@
 
     <color name="dark_purple_edit_text">#512DA8</color>
     <color name="light_purple_text_view">#7E57C2</color>
+
+    <color name="stock_green_text">#2E7D32</color>
+    <color name="stock_red_text">#BF360C</color>
 </resources>
