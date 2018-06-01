@@ -6,15 +6,10 @@
 
     <TextView
         android:id="@+id/call_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
+        style="@style/DialogText"
         android:layout_alignParentTop="true"
-        android:padding="5dp"
         android:drawableStart="@drawable/ic_phone"
-        android:drawablePadding="8dp"
-        android:text="@string/make_call"
-        android:textSize="20sp" />
+        android:text="@string/make_call" />
 
     <TextView
         android:id="@+id/phone_num_subtext"
@@ -27,28 +22,11 @@
 
     <TextView
         android:id="@+id/mail_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
+        style="@style/DialogText"
         android:layout_below="@+id/phone_num_subtext"
         android:layout_marginTop="10dp"
-        android:padding="5dp"
         android:drawableStart="@drawable/ic_email"
-        android:drawablePadding="8dp"
-        android:text="@string/type_email"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/no_sup_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:padding="5dp"
-        android:drawablePadding="8dp"
-        android:text="@string/no_supplier_info"
-        android:textSize="22sp"
-        android:visibility="gone" />
+        android:text="@string/type_email" />
 
     <TextView
         android:id="@+id/email_num_subtext"
@@ -58,4 +36,16 @@
         android:layout_below="@+id/mail_button"
         android:layout_centerVertical="true"
         android:layout_marginStart="40dp" />
+
+    <TextView
+        android:id="@+id/no_sup_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:drawablePadding="8dp"
+        android:padding="5dp"
+        android:text="@string/no_supplier_info"
+        android:textSize="22sp"
+        android:visibility="gone" />
 </RelativeLayout>
