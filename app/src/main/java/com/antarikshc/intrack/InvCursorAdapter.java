@@ -58,6 +58,11 @@ public class InvCursorAdapter extends CursorAdapter {
         RelativeLayout stockButton = view.findViewById(R.id.stock_button_layout);
         RelativeLayout editButton = view.findViewById(R.id.edit_button_layout);
 
+        // Set a tag with the current position of cursor
+        // To be referenced later in button's click listeners
+        int pos = cursor.getPosition();
+        editButton.setTag(pos);
+
         // Cursor sometimes return columns in unordered fashion
         // Get the indices manually ... bruhh
         final int id = cursor.getColumnIndex(InvEntry._ID);
@@ -305,6 +310,9 @@ public class InvCursorAdapter extends CursorAdapter {
             public void onClick(View v) {
                 // Initiate animation of the button
                 v.startAnimation(buttonClick);
+
+                // Set the cursor to position obtained from getTag
+                cursor.moveToPosition(Integer.parseInt(v.getTag().toString()));
 
                 // Create intent for EditorActivity
                 Intent intent = new Intent(context, EditorActivity.class);
