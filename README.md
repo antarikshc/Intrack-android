@@ -36,5 +36,5 @@ Please help us follow the best practice to make it easy for the reviewer as well
 
 ## License
 
-> Copyright (C) 2018 Antariksh  
+> Copyright (C) 2018 Antariksh
 > Licensed under the [GPL-3.0](https://www.gnu.org/licenses/gpl.html) license
