@@ -1,4 +1,4 @@
-package com.antarikshc.intrack;
+package com.antarikshc.intrack.ui;
 
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.antarikshc.intrack.R;
 import com.antarikshc.intrack.data.InvContract;
 import com.antarikshc.intrack.data.InvContract.InvEntry;
 import com.antarikshc.intrack.data.InvDbHelper;

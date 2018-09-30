@@ -8,7 +8,7 @@
     android:paddingEnd="16dp"
     android:paddingStart="11dp"
     android:paddingTop="16dp"
-    tools:context=".EditorActivity">
+    tools:context=".ui.EditorActivity">
 
     <android.support.v7.widget.CardView
         android:id="@+id/item_icon_ring"
