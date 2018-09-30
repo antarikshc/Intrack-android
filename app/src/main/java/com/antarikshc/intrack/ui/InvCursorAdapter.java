@@ -1,4 +1,4 @@
-package com.antarikshc.intrack;
+package com.antarikshc.intrack.ui;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
+import com.antarikshc.intrack.R;
 import com.antarikshc.intrack.data.InvContract;
 import com.antarikshc.intrack.data.InvContract.InvEntry;
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingEnd="16dp"
     android:paddingStart="16dp"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
     <ListView
         android:id="@+id/item_list"

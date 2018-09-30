@@ -1,4 +1,4 @@
-package com.antarikshc.intrack;
+package com.antarikshc.intrack.ui;
 
 import android.app.AlertDialog;
 import android.app.LoaderManager;
@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.antarikshc.intrack.R;
 import com.antarikshc.intrack.data.InvContract;
 import com.antarikshc.intrack.data.InvContract.InvEntry;
 
