@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name=".data.InvProvider"
+            android:authorities="com.antarikshc.intrack"
+            android:exported="false" />
 
         <activity
             android:name=".ui.EditorActivity"

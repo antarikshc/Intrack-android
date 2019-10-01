@@ -18,11 +18,8 @@ import android.view.animation.AnimationUtils
 import android.widget.*
 import com.antarikshc.intrack.R
 import com.antarikshc.intrack.data.InvContract
-import com.antarikshc.intrack.data.InvContract.InvEntry
-import kotlin.math.cos
-import kotlin.math.pow
 
-class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flags */ : CursorAdapter(context, c, 0) {
+class InvCursorAdapter(context: Context?, cursorz:Cursor?, flag:Int = 0): CursorAdapter(context,cursorz,0) {
 
     private var itemStockAmount: TextSwitcher? = null
 
@@ -51,23 +48,23 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
         // Set a tag with the current position of cursor
         // To be referenced later in button's click listeners
         val pos = cursor.position
-        editButton.tag = pos
+        editButton.setTag(pos)
 
         // Cursor sometimes return columns in unordered fashion
         // Get the indices manually ... bruhh
-        val id = cursor.getColumnIndex(InvEntry._ID)
-        val nameIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_NAME)
-        val stockAmountIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_STOCK)
-        val stockCapacityIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_CAPACITY)
-        val iconColumnIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_ICON)
-        val supPhoneIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_PHONE)
-        val supEmailIndex = cursor.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_EMAIL)
+        val id = cursor.getColumnIndex(InvContract.InvEntry._ID)
+        val nameIndex = cursor.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_NAME)
+        val stockAmountIndex = cursor.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_STOCK)
+        val stockCapacityIndex = cursor.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_CAPACITY)
+        val iconColumnIndex = cursor.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_ICON)
+        val supPhoneIndex = cursor.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_SUP_PHONE)
+        val supEmailIndex = cursor.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_SUP_EMAIL)
 
         // Content URI for current item
         val contentUri = ContentUris.withAppendedId(InvContract.CONTENT_URI, cursor.getInt(id).toLong())
 
         // Set the Item Name
-        itemName.text = cursor.getString(nameIndex)
+        itemName.setText(cursor.getString(nameIndex))
 
         if (!cursor.isNull(iconColumnIndex)) {
             // Retrieve blob from cursor and convert to Bitmap
@@ -88,11 +85,11 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
         if (cursor.isNull(stockCapacityIndex) || placeHolderStockCap.isEmpty()) {
 
             // Remove the view
-            itemStockCapacity.visibility = View.GONE
+            itemStockCapacity.setVisibility(View.GONE)
 
         } else {
 
-            itemStockCapacity.text = " / $placeHolderStockCap"
+            itemStockCapacity.setText(" / $placeHolderStockCap")
 
             // Set the stock color depending on capacity
             val stockColor = colorizeStock(context,
@@ -120,7 +117,7 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
         itemStockAmount!!.inAnimation = inAnim
         itemStockAmount!!.outAnimation = outAnim
 
-        saleButton.setOnClickListener { v ->
+        saleButton.setOnClickListener(View.OnClickListener { v ->
             // Initiate animation of the button
             v.startAnimation(buttonClick)
 
@@ -139,12 +136,12 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
 
             // Update Database with decrement in stock
             val values = ContentValues()
-            values.put(InvEntry.COLUMN_ITEM_STOCK, currentStock - 1)
+            values.put(InvContract.InvEntry.COLUMN_ITEM_STOCK, currentStock - 1)
 
             context.contentResolver.update(contentUri, values, null, null)
-        }
+        })
 
-        orderButton.setOnClickListener { v ->
+        orderButton.setOnClickListener(View.OnClickListener { v ->
             // Initiate animation of the button
             v.startAnimation(buttonClick)
 
@@ -171,35 +168,35 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
             // Store values to the strings if present
             if (!cursor.isNull(supPhoneIndex)) {
                 phone = cursor.getString(supPhoneIndex)
-                phoneNum.text = "($phone)"
+                phoneNum.setText("($phone)")
             }
             if (!cursor.isNull(supEmailIndex)) {
                 email = cursor.getString(supEmailIndex)
-                emailId.text = "($email)"
+                emailId.setText("($email)")
             }
 
             // Null checks to hide/show views
             if (phone == null) {
-                callButton.visibility = View.GONE
-                phoneNum.visibility = View.GONE
+                callButton.setVisibility(View.GONE)
+                phoneNum.setVisibility(View.GONE)
             }
             if (email == null) {
-                emailButton.visibility = View.GONE
-                emailId.visibility = View.GONE
+                emailButton.setVisibility(View.GONE)
+                emailId.setVisibility(View.GONE)
             }
             if (phone == null && email == null) {
-                noInfo.visibility = View.VISIBLE
+                noInfo.setVisibility(View.VISIBLE)
             }
 
-            callButton.setOnClickListener {
+            callButton.setOnClickListener(View.OnClickListener {
                 val callIntent = Intent(Intent.ACTION_DIAL)
                 callIntent.data = Uri.parse("tel:" + cursor.getString(supPhoneIndex))
                 context.startActivity(callIntent)
 
                 dialog.dismiss()
-            }
+            })
 
-            emailButton.setOnClickListener {
+            emailButton.setOnClickListener(View.OnClickListener {
                 val emailIntent = Intent(Intent.ACTION_SENDTO)
                 emailIntent.data = Uri.parse("mailto:") // only email apps should handle this
                 emailIntent.putExtra(Intent.EXTRA_EMAIL, cursor.getString(supEmailIndex))
@@ -209,12 +206,12 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
                 }
 
                 dialog.dismiss()
-            }
+            })
 
             dialog.show()
-        }
+        })
 
-        stockButton.setOnClickListener { v ->
+        stockButton.setOnClickListener(View.OnClickListener { v ->
             // Initiate animation of the button
             v.startAnimation(buttonClick)
 
@@ -240,36 +237,36 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
             editStockAmount.setText(currentStock)
 
             // Decrement value on key down
-            keyDown.setOnClickListener {
-                val currentAmount = Integer.parseInt(editStockAmount.text.toString())
+            keyDown.setOnClickListener(View.OnClickListener {
+                val currentAmount = Integer.parseInt(editStockAmount.getText().toString())
                 editStockAmount.setText((currentAmount - 1).toString())
-            }
+            })
 
             // Increment value on key up
-            keyUp.setOnClickListener {
-                val currentAmount = Integer.parseInt(editStockAmount.text.toString())
+            keyUp.setOnClickListener(View.OnClickListener {
+                val currentAmount = Integer.parseInt(editStockAmount.getText().toString())
                 editStockAmount.setText((currentAmount + 1).toString())
-            }
+            })
 
-            saveStock.setOnClickListener {
+            saveStock.setOnClickListener(View.OnClickListener {
                 // Our views are currently bind to the latest item of the list
                 // bind views again for the current item
                 itemStockAmount = view.findViewById(R.id.stock_number)
-                val updatedStock = editStockAmount.text.toString()
+                val updatedStock = editStockAmount.getText().toString()
                 itemStockAmount!!.setCurrentText(updatedStock)
 
                 // Update Database with new stock amount
                 val values = ContentValues()
-                values.put(InvEntry.COLUMN_ITEM_STOCK, Integer.parseInt(updatedStock))
+                values.put(InvContract.InvEntry.COLUMN_ITEM_STOCK, Integer.parseInt(updatedStock))
                 context.contentResolver.update(contentUri, values, null, null)
 
                 dialog.dismiss()
-            }
+            })
 
             dialog.show()
-        }
+        })
 
-        editButton.setOnClickListener { v ->
+        editButton.setOnClickListener(View.OnClickListener { v ->
             // Initiate animation of the button
             v.startAnimation(buttonClick)
 
@@ -285,7 +282,7 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
             intent.data = currentItemUri
 
             context.startActivity(intent)
-        }
+        })
 
     }
 
@@ -294,10 +291,12 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
 
         val ratio = stock.toFloat() / capacity.toFloat()
 
-        return when {
-            ratio < 0.2 -> ContextCompat.getColor(context, R.color.stock_red_text)
-            ratio > 0.8 -> ContextCompat.getColor(context, R.color.stock_green_text)
-            else -> ContextCompat.getColor(context, android.R.color.tab_indicator_text)
+        return if (ratio < 0.2) {
+            ContextCompat.getColor(context, R.color.stock_red_text)
+        } else if (ratio > 0.8) {
+            ContextCompat.getColor(context, R.color.stock_green_text)
+        } else {
+            ContextCompat.getColor(context, android.R.color.tab_indicator_text)
         }
 
     }
@@ -306,9 +305,8 @@ class InvCursorAdapter internal constructor(context: Context, c: Cursor?)/* flag
             private val mAmplitude: Double, private val mFrequency: Double) : android.view.animation.Interpolator {
 
         override fun getInterpolation(time: Float): Float {
-            return (-1.0 * Math.E.pow(-time / mAmplitude) *
-                    cos(mFrequency * time) + 1).toFloat()
+            return (-1.0 * Math.pow(Math.E, -time / mAmplitude) *
+                    Math.cos(mFrequency * time) + 1).toFloat()
         }
     }
-
 }
