@@ -17,11 +17,6 @@
             </intent-filter>
         </activity>
 
-        <provider
-            android:name=".data.InvProvider"
-            android:authorities="com.antarikshc.intrack"
-            android:exported="false" />
-
         <activity
             android:name=".ui.EditorActivity"
             android:parentActivityName=".ui.MainActivity" />
