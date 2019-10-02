@@ -1,6 +1,7 @@
 package com.antarikshc.intrack.ui
 
 import android.app.Activity
+import android.app.LoaderManager
 import android.content.*
 import android.content.res.ColorStateList
 import android.database.Cursor
@@ -28,42 +29,41 @@ import android.widget.TextView
 import android.widget.Toast
 import com.antarikshc.intrack.R
 import com.antarikshc.intrack.data.InvContract
+import com.antarikshc.intrack.data.InvContract.InvEntry
 import com.antarikshc.intrack.data.InvDbHelper
 import java.io.ByteArrayOutputStream
+import kotlin.math.cos
+import kotlin.math.pow
 
-class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCallbacks<Cursor> {
+class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> {
 
-    lateinit var itemIcon: ImageView
+    private lateinit var itemIcon: ImageView
 
-    lateinit var editImage: TextView
+    private lateinit var editImage: TextView
 
-    lateinit var itemName: TextView
-    lateinit var editItemName: AppCompatEditText
+    private lateinit var itemName: TextView
+    private lateinit var editItemName: AppCompatEditText
 
-    lateinit var stockAmount: TextView
-    lateinit var editStockAmount: AppCompatEditText
+    private lateinit var stockAmount: TextView
+    private lateinit var editStockAmount: AppCompatEditText
 
-    lateinit var stockCapacity: TextView
-    lateinit var editStockCapacity: AppCompatEditText
+    private lateinit var stockCapacity: TextView
+    private lateinit var editStockCapacity: AppCompatEditText
 
-    lateinit var supplierInfo: TextView
-    lateinit var editSupplierPhone: AppCompatEditText
-    lateinit var supPhoneIcon: ImageView
-    lateinit var editSupplierEmail: AppCompatEditText
-    lateinit var supEmailIcon: ImageView
+    private lateinit var supplierInfo: TextView
+    private lateinit var editSupplierPhone: AppCompatEditText
+    private lateinit var supPhoneIcon: ImageView
+    private lateinit var editSupplierEmail: AppCompatEditText
+    private lateinit var supEmailIcon: ImageView
 
-    lateinit var saveUpdateButton: TextView
+    private lateinit var saveUpdateButton: TextView
 
     /**
      * Button Click animation as we are using TextView as buttons
      */
-    lateinit var buttonClick: Animation
+    private lateinit var buttonClick: Animation
 
-    // Request codes for Image intents
-    val REQUEST_IMAGE_CAPTURE = 1
-    val PICK_IMAGE = 2
-
-    lateinit var pictureIntent: Intent
+    private lateinit var pictureIntent: Intent
 
     /**
      * Content URI for the existing item (null if it's a new item)
@@ -73,12 +73,7 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
     /**
      * to create PetDbHelper instance
      */
-    lateinit var mDbHelper: InvDbHelper
-
-    /**
-     * Identifier for the inventory data loader
-     */
-    private val EXISTING_INVENT_LOADER = 0
+    private lateinit var mDbHelper: InvDbHelper
 
     /**
      * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
@@ -94,7 +89,7 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mItemHasChanged boolean to true.
      */
-    private val mTouchListener = View.OnTouchListener { view, motionEvent ->
+    private val mTouchListener = View.OnTouchListener { _, _ ->
         mItemHasChanged = true
         false
     }
@@ -149,7 +144,7 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
 
             // Initialize a loader to read the inventory data from the database
             // and display the current values in the editor
-            loaderManager.initLoader(EXISTING_INVENT_LOADER, null, this)
+            loaderManager.initLoader(EXISTING_INVENT_LOADER, Bundle.EMPTY, this)
 
             // We are updating the pet so rename button
             saveUpdateButton.setText(R.string.update_button)
@@ -262,22 +257,22 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
         val clickPhoto = dialogView.findViewById<TextView>(R.id.click_photo)
         val choosePhoto = dialogView.findViewById<TextView>(R.id.choose_photo)
 
-        clickPhoto.setOnClickListener(View.OnClickListener {
+        clickPhoto.setOnClickListener {
             pictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             if (pictureIntent.resolveActivity(packageManager) != null) {
                 startActivityForResult(pictureIntent, REQUEST_IMAGE_CAPTURE)
             }
 
             dialog.dismiss()
-        })
+        }
 
-        choosePhoto.setOnClickListener(View.OnClickListener {
+        choosePhoto.setOnClickListener {
             pictureIntent = Intent(Intent.ACTION_GET_CONTENT)
             pictureIntent.type = "image/*"
             startActivityForResult(pictureIntent, PICK_IMAGE)
 
             dialog.dismiss()
-        })
+        }
 
         dialog.show()
     }
@@ -316,11 +311,11 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
         }
 
         val values = ContentValues()
-        values.put(InvContract.InvEntry.COLUMN_ITEM_NAME, nameOfItem)
-        values.put(InvContract.InvEntry.COLUMN_ITEM_STOCK, stockOfItem)
-        values.put(InvContract.InvEntry.COLUMN_ITEM_CAPACITY, capacityOfItem)
-        values.put(InvContract.InvEntry.COLUMN_ITEM_SUP_PHONE, supPhoneOfItem)
-        values.put(InvContract.InvEntry.COLUMN_ITEM_SUP_EMAIL, supEmailOfItem)
+        values.put(InvEntry.COLUMN_ITEM_NAME, nameOfItem)
+        values.put(InvEntry.COLUMN_ITEM_STOCK, stockOfItem)
+        values.put(InvEntry.COLUMN_ITEM_CAPACITY, capacityOfItem)
+        values.put(InvEntry.COLUMN_ITEM_SUP_PHONE, supPhoneOfItem)
+        values.put(InvEntry.COLUMN_ITEM_SUP_EMAIL, supEmailOfItem)
 
         // Only process the Bitmap if user has selected new image
         if (mItemIconHasChanged) {
@@ -328,7 +323,7 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
             // Converting Bitmap to ByteArray
             val img = getBitmapAsByteArray(iconOfItem)
 
-            values.put(InvContract.InvEntry.COLUMN_ITEM_ICON, img)
+            values.put(InvEntry.COLUMN_ITEM_ICON, img)
         }
 
 
@@ -433,16 +428,15 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
         }
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+    override fun onCreateLoader(id: Int, args: Bundle): Loader<Cursor> {
         // Since the editor shows all pet attributes, define a projection that contains
         // all columns from the pet table
-        val projection = arrayOf(InvContract.InvEntry._ID, InvContract.InvEntry.COLUMN_ITEM_NAME, InvContract.InvEntry.COLUMN_ITEM_STOCK, InvContract.InvEntry.COLUMN_ITEM_CAPACITY, InvContract.InvEntry.COLUMN_ITEM_ICON, InvContract.InvEntry.COLUMN_ITEM_SUP_PHONE, InvContract.InvEntry.COLUMN_ITEM_SUP_EMAIL)
+        val projection = arrayOf(InvEntry._ID, InvEntry.COLUMN_ITEM_NAME, InvEntry.COLUMN_ITEM_STOCK, InvEntry.COLUMN_ITEM_CAPACITY, InvEntry.COLUMN_ITEM_ICON, InvEntry.COLUMN_ITEM_SUP_PHONE, InvEntry.COLUMN_ITEM_SUP_EMAIL)
 
         // This loader will execute the ContentProvider's query method on a background thread
         return CursorLoader(this, // Parent activity context
                 mCurrentUri, // Query the content URI
-                projection,
-                null, null, null)// Columns to include in the resulting Cursor
+                projection, null, null, null)// Columns to include in the resulting Cursor
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
@@ -458,13 +452,12 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
 
             // Cursor sometimes return columns in unordered fashion
             // Get the indices manually ... bruhh
-            val id = data.getColumnIndex(InvContract.InvEntry._ID)
-            val nameIndex = data.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_NAME)
-            val stockAmountIndex = data.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_STOCK)
-            val stockCapacityIndex = data.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_CAPACITY)
-            val iconColumnIndex = data.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_ICON)
-            val supPhoneIndex = data.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_SUP_PHONE)
-            val supEmailIndex = data.getColumnIndex(InvContract.InvEntry.COLUMN_ITEM_SUP_EMAIL)
+            val nameIndex = data.getColumnIndex(InvEntry.COLUMN_ITEM_NAME)
+            val stockAmountIndex = data.getColumnIndex(InvEntry.COLUMN_ITEM_STOCK)
+            val stockCapacityIndex = data.getColumnIndex(InvEntry.COLUMN_ITEM_CAPACITY)
+            val iconColumnIndex = data.getColumnIndex(InvEntry.COLUMN_ITEM_ICON)
+            val supPhoneIndex = data.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_PHONE)
+            val supEmailIndex = data.getColumnIndex(InvEntry.COLUMN_ITEM_SUP_EMAIL)
 
             // Set all the values retrieved from database
             editItemName.setText(data.getString(nameIndex))
@@ -550,7 +543,7 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
                 // Otherwise if there are unsaved changes, setup a dialog to warn the user.
                 // Create a click listener to handle the user confirming that
                 // changes should be discarded.
-                val discardButtonClickListener = DialogInterface.OnClickListener { dialogInterface, i ->
+                val discardButtonClickListener = DialogInterface.OnClickListener { _, _ ->
                     // User clicked "Discard" button, navigate to parent activity.
                     NavUtils.navigateUpFromSameTask(this@EditorActivity)
                 }
@@ -574,7 +567,7 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
 
         // Otherwise if there are unsaved changes, setup a dialog to warn the user.
         // Create a click listener to handle the user confirming that changes should be discarded.
-        val discardButtonClickListener = DialogInterface.OnClickListener { dialogInterface, i ->
+        val discardButtonClickListener = DialogInterface.OnClickListener { _, _ ->
             // User clicked "Discard" button, close the current activity.
             finish()
         }
@@ -598,48 +591,25 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
             // this means bitmap is horizontally oriented
             bitmapRatio = width.toFloat() / height.toFloat()
 
-            if (bitmapRatio == aspectRatio) {
+            croppedImage = if (bitmapRatio == aspectRatio) {
                 // If the Bitmap is 4:3 don't crop
-                croppedImage = ogBitmap
+                ogBitmap
             } else {
-                croppedImage = Bitmap.createBitmap(ogBitmap, width / 2 - height - 2, 0, height, height)
+                Bitmap.createBitmap(ogBitmap, width / 2 - height - 2, 0, height, height)
             }
 
         } else {
             // this means bitmap is vertically oriented
             bitmapRatio = height.toFloat() / width.toFloat()
-            if (bitmapRatio == aspectRatio) {
-                croppedImage = ogBitmap
+            croppedImage = if (bitmapRatio == aspectRatio) {
+                ogBitmap
             } else {
-                croppedImage = Bitmap.createBitmap(ogBitmap, 0, height / 2 - width / 2, width, width)
+                Bitmap.createBitmap(ogBitmap, 0, height / 2 - width / 2, width, width)
             }
         }
 
         return croppedImage
 
-    }
-
-    // To get Bitmap from a Vector Drawable
-    fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap {
-        var drawable = ContextCompat.getDrawable(context, drawableId)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            drawable = DrawableCompat.wrap(drawable!!).mutate()
-        }
-
-        val bitmap = Bitmap.createBitmap(drawable!!.intrinsicWidth,
-                drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-
-        return bitmap
-    }
-
-    // Convert the obtained bitmap into ByteArray to store in DB
-    fun getBitmapAsByteArray(bitmap: Bitmap): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream)
-        return outputStream.toByteArray()
     }
 
     /**
@@ -653,7 +623,7 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
         val builder = AlertDialog.Builder(this)
         builder.setMessage(R.string.unsaved_changes_dialog_msg)
         builder.setPositiveButton(R.string.discard, discardButtonClickListener)
-        builder.setNegativeButton(R.string.keep_editing) { dialog, id ->
+        builder.setNegativeButton(R.string.keep_editing) { dialog, _ ->
             // User clicked the "Keep editing" button, so dismiss the dialog
             // and continue editing the item.
             dialog?.dismiss()
@@ -672,11 +642,11 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
         // for the positive and negative buttons on the dialog.
         val builder = AlertDialog.Builder(this)
         builder.setMessage(R.string.delete_dialog_msg)
-        builder.setPositiveButton(R.string.action_delete) { dialog, id ->
+        builder.setPositiveButton(R.string.action_delete) { _, _ ->
             // User clicked the "Delete" button, so delete the item.
             deletePet()
         }
-        builder.setNegativeButton(R.string.action_delete) { dialog, id ->
+        builder.setNegativeButton(R.string.action_delete) { dialog, _ ->
             // User clicked the "Cancel" button, so dismiss the dialog
             // and continue editing the item.
             dialog?.dismiss()
@@ -691,8 +661,43 @@ class EditorActivity : AppCompatActivity(), android.app.LoaderManager.LoaderCall
             private val mAmplitude: Double, private val mFrequency: Double) : android.view.animation.Interpolator {
 
         override fun getInterpolation(time: Float): Float {
-            return (-1.0 * Math.pow(Math.E, -time / mAmplitude) *
-                    Math.cos(mFrequency * time) + 1).toFloat()
+            return (-1.0 * Math.E.pow(-time / mAmplitude) *
+                    cos(mFrequency * time) + 1).toFloat()
+        }
+    }
+
+    companion object {
+
+        // Request codes for Image intents
+        const val REQUEST_IMAGE_CAPTURE = 1
+        const val PICK_IMAGE = 2
+
+        /**
+         * Identifier for the inventory data loader
+         */
+        private const val EXISTING_INVENT_LOADER = 0
+
+        // To get Bitmap from a Vector Drawable
+        fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap {
+            var drawable = ContextCompat.getDrawable(context, drawableId)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                drawable = DrawableCompat.wrap(drawable!!).mutate()
+            }
+
+            val bitmap = Bitmap.createBitmap(drawable!!.intrinsicWidth,
+                    drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+
+            return bitmap
+        }
+
+        // Convert the obtained bitmap into ByteArray to store in DB
+        fun getBitmapAsByteArray(bitmap: Bitmap): ByteArray {
+            val outputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream)
+            return outputStream.toByteArray()
         }
     }
 }

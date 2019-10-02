@@ -22,28 +22,26 @@ import android.view.View
 import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
+
 import com.antarikshc.intrack.R
 import com.antarikshc.intrack.data.InvContract
+import com.antarikshc.intrack.data.InvContract.InvEntry
+
 import java.io.ByteArrayOutputStream
 
 class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
-     * Identifier for the pet data loader
-     */
-    private val INVENT_LOADER = 0
-
-    /**
      * Adapter and the ListView
      */
-    lateinit var itemListView: ListView
-    lateinit var cursorAdapter: InvCursorAdapter
+    private lateinit var itemListView: ListView
+    private lateinit var cursorAdapter: InvCursorAdapter
 
     // FAB Button
-    lateinit var fabAdd: FloatingActionButton
+    private lateinit var fabAdd: FloatingActionButton
 
     // Spinning Loader
-    lateinit var loadSpin: ProgressBar
+    private lateinit var loadSpin: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,25 +63,26 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
         itemListView.adapter = cursorAdapter
 
         // Initiate the loader
-        loaderManager.initLoader<Cursor>(INVENT_LOADER, null, this)
+        loaderManager.initLoader(INVENT_LOADER, Bundle.EMPTY,this)
 
         // FAB Button to add new Item
         fabAdd.setOnClickListener {
             val intent = Intent(this@MainActivity, EditorActivity::class.java)
             startActivity(intent)
         }
+
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+    override fun onCreateLoader(id: Int, args: Bundle): Loader<Cursor> {
         // Define a projection that specifies the columns from the table we care about.
-        val projection = arrayOf(InvContract.InvEntry._ID, InvContract.InvEntry.COLUMN_ITEM_NAME, InvContract.InvEntry.COLUMN_ITEM_ICON, InvContract.InvEntry.COLUMN_ITEM_STOCK, InvContract.InvEntry.COLUMN_ITEM_CAPACITY, InvContract.InvEntry.COLUMN_ITEM_SUP_PHONE, InvContract.InvEntry.COLUMN_ITEM_SUP_EMAIL)
+        val projection = arrayOf(InvEntry._ID, InvEntry.COLUMN_ITEM_NAME, InvEntry.COLUMN_ITEM_ICON, InvEntry.COLUMN_ITEM_STOCK, InvEntry.COLUMN_ITEM_CAPACITY, InvEntry.COLUMN_ITEM_SUP_PHONE, InvEntry.COLUMN_ITEM_SUP_EMAIL)
 
         // This loader will execute the ContentProvider's query method on a background thread
         return CursorLoader(this, // Parent activity context
                 InvContract.CONTENT_URI, // Provider content URI to query
-                projection, // No selection arguments
-                null, null, null)// Columns to include in the resulting Cursor
+                projection, null, null, null)// Columns to include in the resulting Cursor
         // No selection clause
+        // No selection arguments
         // Default sort order
     }
 
@@ -111,12 +110,12 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
         val img = getBitmapAsByteArray(icon)
 
         val values = ContentValues()
-        values.put(InvContract.InvEntry.COLUMN_ITEM_NAME, "Micro-USB Cable")
-        values.put(InvContract.InvEntry.COLUMN_ITEM_STOCK, 53)
-        values.put(InvContract.InvEntry.COLUMN_ITEM_ICON, img)
-        values.put(InvContract.InvEntry.COLUMN_ITEM_CAPACITY, 100)
-        values.put(InvContract.InvEntry.COLUMN_ITEM_SUP_PHONE, "+9100000000")
-        values.put(InvContract.InvEntry.COLUMN_ITEM_SUP_EMAIL, "order@flipkart.com")
+        values.put(InvEntry.COLUMN_ITEM_NAME, "Micro-USB Cable")
+        values.put(InvEntry.COLUMN_ITEM_STOCK, 53)
+        values.put(InvEntry.COLUMN_ITEM_ICON, img)
+        values.put(InvEntry.COLUMN_ITEM_CAPACITY, 100)
+        values.put(InvEntry.COLUMN_ITEM_SUP_PHONE, "+9100000000")
+        values.put(InvEntry.COLUMN_ITEM_SUP_EMAIL, "order@flipkart.com")
 
         contentResolver.insert(InvContract.CONTENT_URI, values)
     }
@@ -128,11 +127,11 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
 
         val builder = AlertDialog.Builder(this)
         builder.setMessage(R.string.delete_all_dialog_msg)
-        builder.setPositiveButton(R.string.action_delete) { dialog, id ->
+        builder.setPositiveButton(R.string.action_delete) { _, _ ->
             // User clicked the "Delete" button, so delete the item.
             contentResolver.delete(InvContract.CONTENT_URI, null, null)
         }
-        builder.setNegativeButton(R.string.action_cancel) { dialog, id ->
+        builder.setNegativeButton(R.string.action_cancel) { dialog, _ ->
             // User clicked the "Cancel" button, so dismiss the dialog
             // and continue editing the item.
             dialog?.dismiss()
@@ -170,31 +169,34 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-    }
+    companion object {
 
-    // To get Bitmap from a Vector Drawable
-    fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap {
-        var drawable = ContextCompat.getDrawable(context, drawableId)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            drawable = DrawableCompat.wrap(drawable!!).mutate()
+        /**
+         * Identifier for the pet data loader
+         */
+        private const val INVENT_LOADER = 0
+
+        // To get Bitmap from a Vector Drawable
+        fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap {
+            var drawable = ContextCompat.getDrawable(context, drawableId)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                drawable = DrawableCompat.wrap(drawable!!).mutate()
+            }
+
+            val bitmap = Bitmap.createBitmap(drawable!!.intrinsicWidth,
+                    drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+
+            return bitmap
         }
 
-        val bitmap = Bitmap.createBitmap(drawable!!.intrinsicWidth,
-                drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-
-        return bitmap
+        // Convert the obtained bitmap into ByteArray to store in DB
+        fun getBitmapAsByteArray(bitmap: Bitmap): ByteArray {
+            val outputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream)
+            return outputStream.toByteArray()
+        }
     }
-
-    // Convert the obtained bitmap into ByteArray to store in DB
-    fun getBitmapAsByteArray(bitmap: Bitmap): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream)
-        return outputStream.toByteArray()
-    }
-
 }
